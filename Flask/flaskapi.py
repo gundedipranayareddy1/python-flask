@@ -6,7 +6,7 @@ from flask import request
 from flask import Flask,Blueprint
 
 #app = Blueprint('AudioFile', __name__)
-from AudioFiles.AudioFile import create_song
+from AudioFiles.AudioFile import create_song, create_podcast, create_audiobook
 from Database.database import get_db_connection
 
 app = Flask(__name__)
@@ -26,39 +26,44 @@ def hello_world():
 
 @app.route('/create', methods=['GET'])
 def create_audiofile():
-    metadata = request.json['audioFiles']
+    #metadata = request.json['audioFiles']
+    metadata = request.json
+    print("$",metadata)
     filetype = metadata['audioFileType']
+    print("!",filetype)
     filemeta = metadata['audioFileMetadata']
 
     print("@@", filetype)
     print("!!", filemeta)
-    #with get_db_connection as db:
-
-    conn = sqlite3.connect('database.sqlite')
-    if filetype == "song":
-        a = create_song(conn, metadata)
-        print(a)
-        return a
-    elif filetype == "podcast":
-        return 'podcast'
-    elif filetype == "audiobook":
-        return 'audiobook'
-    else:
-        return "unknown filetype"
-
-
-@app.route('/update/<audioFileType>/<audioFileID>', methods=['GET'])
-def update_audiofile(audioFileType,audioFileID):
-    return 'updated'
+    with get_db_connection() as conn:
+        if filetype == "song":
+            song = create_song(conn, filemeta)
+            print(song)
+            return song
+        elif filetype == "podcast":
+            podcast = create_podcast(conn, filemeta)
+            print(podcast)
+            return 'podcast'
+        elif filetype == "audiobook":
+            audiobook = create_audiobook(conn, filemeta)
+            print(audiobook)
+            return 'audiobook'
+        else:
+            return "unknown filetype"
 
 
-@app.route('/read/<audioFileType>/<audioFileID>', methods=['GET'])
-def play_audiofile(audioFileType,audioFileID):
-    return 'read'
-
-@app.route('/delete/<audioFileType>/<audioFileID>', methods=['GET'])
-def delete_audiofile(audioFileType,audioFileID):
-    return 'deleted'
+# @app.route('/update/<audioFileType:String>/<audioFileID:int>', methods=['GET'])
+# def update_audiofile(audioFileType,audioFileID):
+#     return 'updated'
+#
+#
+# @app.route('/read/<audioFileType:String>/<audioFileID:int>', methods=['GET'])
+# def play_audiofile(audioFileType,audioFileID):
+#     return 'read'
+#
+# @app.route('/delete/<audioFileType:String>/<audioFileID:int>', methods=['GET'])
+# def delete_audiofile(audioFileType,audioFileID):
+#     return 'deleted'
 
 
 # main driver function
