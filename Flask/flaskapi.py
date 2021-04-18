@@ -9,68 +9,49 @@ from Database.database import get_db_connection
 app = Flask(__name__)
 
 
-@app.route('/')
-def hello_world():
-    return 'Hello World'
-
-
 @app.route('/create', methods=['GET'])
 def create_audiofile():
-    #metadata = request.json['audioFiles']
     metadata = request.json
-    print("$", metadata)
     filetype = metadata['audioFileType']
     filemeta = metadata['audioFileMetadata']
 
-    print("@@", filetype)
-    print("!!", filemeta)
     with get_db_connection() as conn:
         if filetype == "song":
-            song = create_song(conn, filemeta)
-            print(song)
-            return song
+            create_song(conn, filemeta)
+            return "Action is successful: 200 OK"
         elif filetype == "podcast":
-            podcast = create_podcast(conn, filemeta)
-            print(podcast)
-            return podcast
+            create_podcast(conn, filemeta)
+            return "Action is successful: 200 OK"
         elif filetype == "audiobook":
-            audiobook = create_audiobook(conn, filemeta)
-            print(audiobook)
-            return audiobook
+            create_audiobook(conn, filemeta)
+            return "Action is successful: 200 OK"
         else:
             return bad_request
 
 
 @app.route('/update/<string:audioFileType>/<int:audioFileID>', methods=['GET'])
-def update_audiofile(audioFileType,audioFileID):
+def update_audiofile(audioFileType, audioFileID):
     metadata = request.json
-    print("$", metadata)
     filetype = metadata['audioFileType']
     filemeta = metadata['audioFileMetadata']
 
-    print("@@", filetype)
-    print("!!", filemeta)
     with get_db_connection() as conn:
         if filetype == "song":
-            song = create_song(conn, filemeta)
-            print(song)
-            return song
+            create_song(conn, filemeta)
+            return "Action is successful: 200 OK"
         elif filetype == "podcast":
-            podcast = create_podcast(conn, filemeta)
-            print(podcast)
-            return podcast
+            create_podcast(conn, filemeta)
+            return "Action is successful: 200 OK"
         elif filetype == "audiobook":
-            audiobook = create_audiobook(conn, filemeta)
-            print(audiobook)
-            return audiobook
+            create_audiobook(conn, filemeta)
+            return "Action is successful: 200 OK"
         else:
             return bad_request()
 
 
-
-@app.route('/read/<audioFileType>', methods=['GET'])
-@app.route('/read/<audioFileType>/<audioFileID>', methods=['GET'])
-def read_audiofile(audioFileType, audioFileID=None):
+@app.route('/read/<string:audioFileType>', methods=['GET'])
+@app.route('/read/<string:audioFileType>/<int:audioFileID>', methods=['GET'])
+def  read_audiofile(audioFileType, audioFileID=None):
     with get_db_connection() as conn:
         try:
             if audioFileType in ("song", "podcast", "audiobook"):
@@ -82,14 +63,12 @@ def read_audiofile(audioFileType, audioFileID=None):
                     return audiofile
             else:
                 return bad_request()
-        except sqlite3.Error as e:
+        except:
             error_message
 
 
-
-
 @app.route('/delete/<string:audioFileType>/<int:audioFileID>', methods=['GET'])
-def delete_audiofile(audioFileType,audioFileID):
+def delete_audiofile(audioFileType, audioFileID):
     with get_db_connection() as conn:
         try:
             if audioFileType in ("song", "podcast", "audiobook"):
@@ -102,22 +81,23 @@ def delete_audiofile(audioFileType,audioFileID):
             return error_message
 
 
-
 @app.errorhandler(500)
 def error_message():
-    return "<h1>505</h1><p>500 internal server error</p>", 500
+    return "500 internal server error", 500
+
 
 # @app.errorhandler(404)
 # def page_not_found():
-#     return "<h1>404</h1><p>The resource could not be found.</p>", 404
+#     return "The resource could not be found.", 404
 
 @app.errorhandler(400)
 def bad_request():
-    return "<h1>400</h1><p>The request is invalid: 400 bad request</p>", 400
+    return "The request is invalid: 400 bad request", 400
+
 
 # main driver function
 if __name__ == '__main__':
-
-    # run() method of Flask class runs the application 
+    # run() method of Flask class runs the application
     # on the local development server.
+
     app.run(debug=True)
